@@ -1,0 +1,22 @@
+.#{$yogi-base-button} {
+    display: block;
+    background: transparent;
+    border: 2px solid $base-button-border;
+    padding: 10px 20px;
+    cursor: pointer;
+    -webkit-user-drag: none;
+    user-select: none;
+    box-sizing: border-box;
+}
+
+.#{$yogi-base-button--disabled} {
+    display: block;
+    background: transparent;
+    border: 2px solid $base-button-border;
+    opacity: 0.4;
+    padding: 10px 20px;
+    cursor: pointer;
+    -webkit-user-drag: none;
+    user-select: none;
+    box-sizing: border-box;
+}
