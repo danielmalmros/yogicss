@@ -1,16 +1,7 @@
 var path = require('path')
-var merge = require('webpack-merge')
-var webpack = require('webpack')
 var config = require('../config')
 var utils = require('./utils')
-var ExtractTextPlugin = require('extract-text-webpack-plugin')
-var OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
-
-function resolve (dir) {
-  return path.join(__dirname, '..', dir)
-}
-
-var isDev = process.env.NODE_ENV === 'development'
+var projectRoot = path.resolve(__dirname, '../')
 
 module.exports = {
   entry: {
@@ -18,72 +9,109 @@ module.exports = {
   },
   output: {
     path: config.build.assetsRoot,
-    filename: '[name].js',
-    publicPath: isDev
-      ? config.dev.assetsPublicPath
-      : config.build.assetsPublicPath
+    publicPath: process.env.NODE_ENV === 'production' ? config.build.assetsPublicPath : config.dev.assetsPublicPath,
+    filename: '[name].js'
   },
   resolve: {
-    extensions: ['.js', '.json'],
+    extensions: ['', '.js', '.vue'],
+    fallback: [path.join(__dirname, '../node_modules')],
     alias: {
-      '@': resolve('src')
+      'vue': 'vue/dist/vue',
+      'bourgeon': path.resolve(__dirname, '../src/bourgeon'),
+      'utils': path.resolve(__dirname, './utils'),
+      'src': path.resolve(__dirname, '../src'),
+      'assets': path.resolve(__dirname, '../src/assets'),
+      'components': path.resolve(__dirname, '../src/components'),
+      'pages': path.resolve(__dirname, '../src/pages')
     }
   },
+  resolveLoader: {
+    fallback: [path.join(__dirname, '../node_modules')]
+  },
   module: {
-    rules: [
+    preLoaders: [
+      // {
+      //   test: /\.vue$/,
+      //   loader: 'eslint',
+      //   include: projectRoot,
+      //   exclude: /node_modules/
+      // },
       {
-        test: /\.js/,
-        loader: 'eslint-loader',
-        enforce: 'pre',
-        include: [resolve('src'), resolve('test')],
+        enforce: "pre",
+        test: /\.(js|vue)$/,
+        loader: 'eslint',
+        include: projectRoot,
+        exclude: /node_modules/,
         options: {
           formatter: require('eslint-friendly-formatter')
         }
+      }
+    ],
+    loaders: [
+      {
+        test: /\.vue$/,
+        loader: 'vue'
       },
       {
         test: /\.js$/,
-        loader: 'babel-loader',
-        include: [resolve('src'), resolve('test')]
+        loader: 'babel',
+        include: projectRoot,
+        exclude: /node_modules/
       },
       {
-        test: /\.pug$/,
-        loader: 'pug-loader',
-        options: {
-          root: resolve('src/views'),
-          pretty: true
-        }
+        test: /\.json$/,
+        loader: 'json'
       },
       {
-        test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-        loader: 'url-loader',
-        options: {
+        test: /\.yml$/,
+        loaders: ['json', 'yaml']
+      },
+      {
+        test: /\.svg(\?.*)?$/,
+        loader: 'svg-sprite?' + JSON.stringify({
+          name: '[name]_[hash]',
+          spriteModule: 'utils/sprite',
+          prefixize: true
+        })
+      },
+      {
+        test: /\.(png|jpe?g|gif)(\?.*)?$/,
+        loader: 'url',
+        query: {
           limit: 10000,
-          name: utils.assetsPath('img/[name].[hash:7].[ext]')
+          name: utils.assetsPath('img/[name].[hash:7].[ext]'),
         }
       },
       {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-        loader: 'url-loader',
-        options: {
+        loader: 'url',
+        query: {
           limit: 10000,
           name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
         }
       }
     ]
   },
-  plugins: [
-    ...utils.pageFile(isDev),
-    // extract css into its own file
-    new ExtractTextPlugin({
-      filename: utils.assetsPath('css/[name].[contenthash].css')
+  eslint: {
+    formatter: require('eslint-friendly-formatter')
+  },
+  vue: {
+    loaders: utils.cssLoaders({
+      paths: 'node_modules'
     }),
-    // Compress extracted CSS. We are using this plugin so that possible
-    // duplicated CSS from different components can be deduped.
-    new OptimizeCSSPlugin({
-      cssProcessorOptions: {
-        safe: true
-      }
-    }),
-    new webpack.ProvidePlugin({})
-  ]
+    postcss: [
+      require('autoprefixer')({
+        browsers: ['last 2 versions']
+      })
+    ]
+  },
+  stylus: {
+    use: [
+      require('poststylus')(require('lost')()),
+      require('rupture')()
+    ],
+    import: [
+      path.resolve(__dirname, '../src/styles/index.styl')
+    ]
+  }
 }

@@ -1,0 +1,44 @@
+$small_mobile = 415px
+$mobile = 736px
+$tablet = 1024px
+$desktop = 1440px
+$x-desktop = 1890px
+
+rupture.mobile-cutoff = $mobile
+rupture.desktop-cutoff = $tablet
+rupture.anti-overlap = 1px
+
+rupture.scale = 0 $mobile $tablet $desktop $x-desktop
+
+head {font-family:"large";}
+body:after{ content:"large"; display:none;}
+
++above($x-desktop)
+	head
+		font-family 'xxlarge'
+	body:after
+		content 'xxlarge'
+
++between($desktop, $x-desktop)
+	head
+		font-family 'xlarge'
+	body:after
+		content 'xlarge'
+
++between($tablet, $desktop)
+	head
+		font-family 'large'
+	body:after
+		content 'large'
+
++tablet()
+	head
+		font-family 'medium'
+	body:after
+		content 'medium'
+
++mobile()
+	head
+		font-family 'small'
+	body:after
+		content 'small'

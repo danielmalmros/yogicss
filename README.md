@@ -1,4 +1,3 @@
 YogiCSS
 ==========================
-
-A modern responsive CSS framework for every web project.
+A modern CSS snippet library for every web project.

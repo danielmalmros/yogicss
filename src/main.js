@@ -1,6 +1,13 @@
-// Load app style
-import 'normalize.css'
-import '@/styles/main.scss'
+import Vue from 'vue'
+import Bourgeon from 'bourgeon'
+import App from './App.vue'
 
-// Scripts
-import './scripts'
+Vue.use(Bourgeon, {})
+
+// Global components
+// Vue.component('navigation', Navigation)
+
+/* eslint-disable no-new */
+new Vue({
+  render: h => h(App)
+}).$mount('#app')
